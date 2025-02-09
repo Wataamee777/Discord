@@ -2,6 +2,7 @@ import discord
 import os
 import requests
 from flask import Flask, redirect, request
+from threading import Thread
 
 app = Flask(__name__)
 
@@ -83,4 +84,13 @@ def send_auth_log(username, user_id):
     if channel:
         bot.loop.create_task(channel.send(f"✅ {username} (ID: {user_id}) が認証しました。"))
 
-bot.run(BOT_TOKEN)
+def run_flask():
+    app.run(host="0.0.0.0", port=8080)
+
+if __name__ == "__main__":
+    # Flask サーバーを別スレッドで起動
+    thread = Thread(target=run_flask)
+    thread.start()
+
+    # Discord Bot を実行
+    bot.run(BOT_TOKEN)
